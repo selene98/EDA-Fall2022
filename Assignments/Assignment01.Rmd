@@ -16,11 +16,13 @@ filter.lfs.process=git-lfs filter-process
 filter.lfs.required=true
 user.name=selene98
 user.email=xt44@duke.edu
+
 ### My Git remote settings:
 origin  https://github.com/selene98/EDA-Fall2022 (fetch)
 origin  https://github.com/selene98/EDA-Fall2022 (push)
 upstream        https://github.com/ENV872/EDA-Fall2022 (fetch)
 upstream        DISABLE (push)
+
 ### My Git changes:
 b327385 (HEAD -> main, origin/main, origin/HEAD) Add new Assignment01 file
 86fe3be Modify of GitDemo
