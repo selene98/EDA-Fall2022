@@ -73,7 +73,7 @@ Below is a chunk of R code. You can run R code in several ways:
 
 ```{r}
 # Basic math
-1 + 1
+
 1 - 1
 2 * 2
 1 / 2
@@ -128,6 +128,9 @@ What happens if there is a typo in your code? Type the following in the R window
 
 ```{r}
 long_name_for_illustration <- 11
+long_name_for_illustration
+Long_name_for_illustration
+longnameforillustration
 
 ```
 
