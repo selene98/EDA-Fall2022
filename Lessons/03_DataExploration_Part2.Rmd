@@ -61,7 +61,8 @@ Visualize count data for categorical variables.
 ggplot(USGS.flow.data, aes(x = discharge.mean.approval)) +
   geom_bar()
 
-
+ggplot(na.omit(USGS.flow.data), aes(x = discharge.mean.approval)) +
+  geom_bar()
 
 ```
 
@@ -71,7 +72,7 @@ Visualize distributions of values for continuous numerical variables. What is ha
 
 ```{r, fig.height = 3, fig.width = 4}
 #
-ggplot(USGS.flow.data) +
+ ggplot(USGS.flow.data) +
   geom_histogram(aes(x = discharge.mean))
 
 #
@@ -80,7 +81,7 @@ ggplot(USGS.flow.data) +
 
 #
 ggplot(USGS.flow.data) +
-  geom_histogram(aes(x = discharge.mean), bins = 20)
+  geom_histogram(aes(x = discharge.mean), bins = 20) #bins usually between 5-20
 
 #
 ggplot(USGS.flow.data, aes(x = discharge.mean)) +
@@ -154,20 +155,30 @@ ggplot(USGS.flow.data) +
 Question: under what circumstances would it be beneficial to use each of these graph types (bar plot, histogram, frequency polygon, box-and whisker, violin, scatterplot)?
 
 > Answer: 
+--Bar plots are usually used to compare things between different groups or to track changes over time. 
+--For histogram, the data are supposed to be numerical, the plots show the shape of the data's distribution, especially when determining whether the output of a process is distributed approximately normally.
+--Frequency polygon is a graphical form of representation of data, which usually used to depict the shape of the numeric data and to depict trends.
+--Box and whisker plots are normally used to show the distribution of data within a population.
+--Violin plots are used when we need to observe the distribution of numeric data and make a comparison of distributions between multiple groups.
+--Scatterplots could be usually used to determine relationships between the two different things such as showing the positive relationship or negative relationship.
 
 ## Ending discussion
 
 What did you learn about the USGS discharge dataset today? What separate insights did the different graph types offer?
 > Answer: 
+--The USGS discharge dataset shows the mean, maximum and minmum dischage rate, gage heights and their approval for publication status among time from 1928 to 2019 at the site of Eno River, NC. Although some data during 1970 to 1990 have been missed,it still gathered good information about stream flow water data to audience.
+--The discharge value varies among years and has a positive relationship with the gage height data through the scatterplot and box plot. The violin plot and box plot show comparison about the data distribution of discharge rate among differnet approval status and outliers in each character group. The line chart and histogram show the the distribution of discharge rate is mostly among 0-100, which is quite skewed. 
 
 
 How can multiple options for data exploration inform our understanding of our data?
 
 > Answer: 
+--Multiple options for data exploration could help us understand the structure of the dataset, the presence of outliers, and the distribution of data values in order to reveal patterns and points of interest, enabling data analysts to gain greater insight into the raw data.
 
 
 Do you see any patterns in the USGS data for the Eno River? What might be responsible for those patterns and/or relationships?
 
 > Answer: 
+--The positive relationship between the stream discharge value and the gage height value is probably due to the natural rules that usually water with deep depth has high volume of flow. From the distribution of discharge rate in different groups, approved group has more outliers and contains more data, which is perhaps because approved data for publications could contain data ad researched many unusual conditions happened among recorded years, so it has a lot very high or low value compared with the unproved group. For the absence of around 20 years' records, it might due to the lack of measuring equipments or measured other type of river data instead.
 
 
