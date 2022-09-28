@@ -89,6 +89,7 @@ ggplot(Neonics, aes(x = Species.Common.Name)) +
 
 ```{r}
 class(Neonics$Conc.1..Author.)
+
 ```
 
 > Answer:
@@ -128,29 +129,39 @@ ggplot(Neonics, aes(x = Endpoint)) +
 
 ```{r}
 class(Litter$collectDate)
-Litter$collectDate <- as.Date(Litter$collectDate, format = "%m/%d/%y") 
+Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y-%m-%d") 
 class(Litter$collectDate)
-unique()
+unique(Litter$collectDate)
+
 ```
 
 13. Using the `unique` function, determine how many plots were sampled at Niwot Ridge. How is the information obtained from `unique` different from that obtained from `summary`?
 
 ```{r}
-
+unique(Litter$plotID)
+length(unique(Litter$plotID))
 ```
 
-> Answer:
+> Answer: Data obtained from 'unique' is mostly list different names or value in the specific dataset. 
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
 ```{r}
+ggplot(Litter, aes(x = functionalGroup)) +
+  geom_bar(color="light blue", fill="light blue")
 
 ```
 
 15. Using `geom_boxplot` and `geom_violin`, create a boxplot and a violin plot of dryMass by functionalGroup.
 
 ```{r}
+ggplot(Litter) +
+  geom_boxplot(aes(x = functionalGroup, y = dryMass))
 
+
+ggplot(Litter) +
+  geom_violin(aes(x = functionalGroup, y = dryMass),
+              draw_quantiles = c(0.25, 0.5, 0.75))
 ```
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
@@ -159,4 +170,4 @@ Why is the boxplot a more effective visualization option than the violin plot in
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
-> Answer:
+> Answer: Needles
