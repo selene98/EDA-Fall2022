@@ -49,9 +49,9 @@ Litter <- read.csv("../Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv")
 4.  How is litter and woody debris sampled as part of the NEON network? Read the NEON_Litterfall_UserGuide.pdf document to learn more. List three pieces of salient information about the sampling methods here:
 
 > Answer: 
- 1.Tower plots sampling
- 2.
- 3.
+ 1.Tower plots sampling equipment used as spatial sampling.
+ 2.Place trap within plots either targeted or randomized based on the vegetation.
+ 3.Sample ground traps every year as the temporal sampling.
 
 ## Obtain basic summaries of your data (Neonics)
 
@@ -86,7 +86,7 @@ summary(Neonics$Species.Common.Name)
 class(Neonics$Conc.1..Author.)
 ```
 
-> Answer:
+> Answer: The class of Conc.1..Author is character,  
 
 ## Explore your data graphically (Neonics)
 
@@ -101,7 +101,7 @@ ggplot(Neonics) +
 
 ```{r}
 ggplot(Neonics) +
-  geom_freqpoly(aes(x = Test.Location), bins = 50, color = "pink")
+  geom_freqpoly(aes(x = Publication.Year, y = Test.Location), bins = 50, color = "pink")
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
@@ -111,11 +111,14 @@ Interpret this graph. What are the most common test locations, and do they diffe
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information.
 
 ```{r}
+class(Neonics$Endpoint)
+Neonics$Endpoint <- as.factor(Neonics$Endpoint)
+summary(Neonics$Endpoint)
 ggplot(Neonics, aes(x = Endpoint)) +
   geom_bar()
 ```
 
-> Answer:
+> Answer: The two most common endpoints are population and mortality, which are defined by the effect. The population should be the insects population effected by the neonicotinoids and the mortality is defined as how many insects were infected to death compared as the whole population.
 
 ## Explore your data (Litter)
 
@@ -136,7 +139,7 @@ unique(Litter$plotID)
 length(unique(Litter$plotID))
 ```
 
-> Answer: Data obtained from 'unique' is mostly list different names or value in the specific dataset. 
+> Answer: Data obtained from 'unique' could help to eliminate repeated values and help us understand the number of different character or value we have in this dataset. However, 'summary' function usually summarize the data to show its data distribution and characteristics by the class of the dataset. 
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
