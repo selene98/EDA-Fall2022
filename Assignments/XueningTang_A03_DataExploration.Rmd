@@ -25,7 +25,6 @@ The completed exercise is due on Sept 30th.
 1.  Check your working directory, load necessary packages (tidyverse), and upload two datasets: the ECOTOX neonicotinoid dataset (ECOTOX_Neonicotinoids_Insects_raw.csv) and the Niwot Ridge NEON dataset for litter and woody debris (NEON_NIWO_Litter_massdata_2018-08_raw.csv). Name these datasets "Neonics" and "Litter", respectively. Be sure to include the subcommand to read strings in as factors.
 
 ```{r,  message = FALSE}
-setwd("/Users/xueningtang/Desktop/R lab/EDA-Fall2022")
 getwd()
 library(dplyr)
 library(ggplot2)
@@ -45,14 +44,14 @@ Litter <- read.csv("../Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv")
 
 3.  The Niwot Ridge litter and woody debris dataset was collected from the National Ecological Observatory Network, which collectively includes 81 aquatic and terrestrial sites across 20 ecoclimatic domains. 32 of these sites sample forest litter and woody debris, and we will focus on the Niwot Ridge long-term ecological research (LTER) station in Colorado. Why might we be interested in studying litter and woody debris that falls to the ground in forests? Feel free to do a brief internet search if you feel you need more background information.
 
-> Answer:
+> Answer: Leaf litter and woody debris are important components of healthy soil. Decomposing litter and debris release nutrients into the soil and also keeps it moist. It also serves as great nesting material, hiding places and protected spots for animals. In this way, studying this dataset could help us develop more complete information about the forest ecosystem.
 
 4.  How is litter and woody debris sampled as part of the NEON network? Read the NEON_Litterfall_UserGuide.pdf document to learn more. List three pieces of salient information about the sampling methods here:
 
 > Answer: 
- 1.
+ 1.Tower plots sampling
  2.
- 3. 
+ 3.
 
 ## Obtain basic summaries of your data (Neonics)
 
@@ -60,17 +59,13 @@ Litter <- read.csv("../Data/Raw/NEON_NIWO_Litter_massdata_2018-08_raw.csv")
 
 ```{r}
 dim(Neonics)
-
 ```
 
 6.  Using the `summary` function on the "Effect" column, determine the most common effects that are studied. Why might these effects specifically be of interest?
 
 ```{r}
+Neonics$Effect <- as.factor(Neonics$Effect)
 summary(Neonics$Effect)
-
-ggplot(Neonics, aes(x = Effect)) +
-  geom_bar()
-
 ```
 
 > Answer:The most common effect studied is "Mortality". Because the most severe effect for insects group is causing death and it could show how much toxic effects on insects.
@@ -78,18 +73,17 @@ ggplot(Neonics, aes(x = Effect)) +
 7.  Using the `summary` function, determine the six most commonly studied species in the dataset (common name). What do these species have in common, and why might they be of interest over other insects? Feel free to do a brief internet search for more information if needed.
 
 ```{r}
+Neonics$Species.Common.Name <- as.factor(Neonics$Species.Common.Name) 
+class(Neonics$Species.Common.Name)
 summary(Neonics$Species.Common.Name)
-ggplot(Neonics, aes(x = Species.Common.Name)) +
-  geom_bar()
 ```
 
-> Answer:
+> Answer:Honey Bee, Parasitic Wasp, Buff Tailed Bumblebee, Carniolan Honey Bee, Bumble Bee, Italian Honeybee are six most frequent species studied in this research. We can see they are all from species of bees, which is the most effected specites by attacking the central nervous system of insects, causing overstimulation of their nerve cells, paralysis and death.
 
 8.  Concentrations are always a numeric value. What is the class of Conc.1..Author. in the dataset, and why is it not numeric?
 
 ```{r}
 class(Neonics$Conc.1..Author.)
-
 ```
 
 > Answer:
@@ -107,7 +101,7 @@ ggplot(Neonics) +
 
 ```{r}
 ggplot(Neonics) +
-  geom_freqpoly(aes(x = Publication.Year ), bins = 50, color = "pink")
+  geom_freqpoly(aes(x = Test.Location), bins = 50, color = "pink")
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
@@ -166,8 +160,8 @@ ggplot(Litter) +
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
 
-> Answer:
+> Answer: In the box plot, it is clear to compare different groups' data distribution and understand the highest and the lowest biomass types. However, in violin plot, it can not show the direct distribution among one group from the low to high value becasue the function we used to eliminate repeated values by 'unique'.
 
 What type(s) of litter tend to have the highest biomass at these sites?
 
-> Answer: Needles
+> Answer: The type of Needles have the highest median, mean and maximum value. Also, it distributed a lot more at the highest value zone than other types.
