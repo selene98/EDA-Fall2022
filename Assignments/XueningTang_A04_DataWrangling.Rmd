@@ -34,6 +34,7 @@ The completed exercise is due on Friday, Oct7th @ 5:00pm.
 ```{r, message = FALSE}
 #1
 library(dplyr)
+library(vctrs)
 library(tidyverse)
 library(lubridate)
 library(stringr)
@@ -106,26 +107,20 @@ EPA_data <- rbind(EPAO3_18_aq, EPAO3_19_aq,EPAPM2.5_18_aq, EPAPM2.5_19_aq )
 EPA_data$DAILY_AQI_VALUE <- as.numeric(EPA_data$DAILY_AQI_VALUE)
 EPA_data$SITE_LATITUDE <- as.numeric(EPA_data$SITE_LATITUDE)
 EPA_data$SITE_LONGITUDE <- as.numeric(EPA_data$SITE_LONGITUDE)
-EPA_data_summary <- 
+
+EPA.data.summaries <- 
   EPA_data %>% 
-  filter(Site.Name == "Linville Falls"| 
-           Site.Name == "Durham Armory"| 
-           Site.Name == "Leggett"| 
-           Site.Name == "Hattie Avenue"| 
-           Site.Name == "Clemmons Middle"| 
-           Site.Name == "Mendenhall School"| 
-           Site.Name == "Frying Pan Mountain"| 
-           Site.Name == "West Johnston Co."| 
-           Site.Name == "Garinger High School"| 
-           Site.Name == "Castle Hayne"| 
-           Site.Name == "Pitt Agri. Center"| 
-           Site.Name == "Bryson City"| 
-           Site.Name == "Millbrook School") %>%
-  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>% 
   summarise(meanAQI = mean(DAILY_AQI_VALUE), 
             meanLA = mean(SITE_LATITUDE), 
-            meanLG = mean(SITE_LONGITUDE))
+            meanLG = mean(SITE_LONGITUDE)) %>% 
+  mutate(month = month(Date),
+       year = year(Date))
 
+ filter(Site.Name == "Linville Falls"| Site.Name == "Durham Armory"| Site.Name == "Leggett"| Site.Name == "Hattie Avenue"| Site.Name == "Clemmons Middle"| Site.Name == "Mendenhall School"| Site.Name == "Frying Pan Mountain"| Site.Name == "West Johnston Co."| Site.Name == "Garinger High School"| Site.Name == "Castle Hayne"| Site.Name == "Pitt Agri. Center"| Site.Name == "Bryson City"| Site.Name == "Millbrook School")
+    
+write.csv(EPA_data_summary, row.names = FALSE, 
+          file ="./Data/Processed/EPA_data_summary_Processed.csv")
   
 #9
 
