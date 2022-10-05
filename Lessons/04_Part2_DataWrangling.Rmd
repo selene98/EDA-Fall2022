@@ -17,7 +17,7 @@ editor_options:
 
 ```{r, message = FALSE}
 getwd()
-#library(plyr)
+#library(dplyr)
 library(tidyverse)
 library(lubridate)
 NTL.phys.data.PeterPaul <- read.csv("./Data/Processed/NTL-LTER_Lake_ChemistryPhysics_PeterPaul_Processed.csv")
@@ -180,7 +180,7 @@ dplyr functionality, combined with the pipes operator, allows us to split datase
 ```{r}
 NTL.PeterPaul.summaries <- 
   NTL.phys.nutrient.data.PeterPaul %>%
-  filter(depth == 0) %>%
+  filter(depth %in% 0) %>%
   group_by(lakename, month) %>%
   filter(!is.na(temperature_C) & !is.na(tn_ug) & !is.na(tp_ug)) %>%
   summarise(meantemp = mean(temperature_C), 

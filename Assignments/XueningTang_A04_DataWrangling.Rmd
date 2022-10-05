@@ -33,8 +33,10 @@ The completed exercise is due on Friday, Oct7th @ 5:00pm.
 
 ```{r, message = FALSE}
 #1
+library(dplyr)
 library(tidyverse)
 library(lubridate)
+library(stringr)
 EPAPM2.5_18 <- read.csv("../Data/Raw/EPAair_PM25_NC2018_raw.csv")
 EPAPM2.5_19 <- read.csv("../Data/Raw/EPAair_PM25_NC2019_raw.csv")
 EPAO3_18 <- read.csv("../Data/Raw/EPAair_O3_NC2018_raw.csv")
@@ -59,13 +61,27 @@ colnames(EPAPM2.5_19)
 
 ```{r}
 #3
+EPAO3_18$Date <- as.Date(EPAO3_18$Date, format = "%m/%d/%Y")
+EPAO3_19$Date <- as.Date(EPAO3_19$Date, format = "%m/%d/%Y")
+EPAPM2.5_18$Date <- as.Date(EPAPM2.5_18$Date, format = "%m/%d/%Y")
+EPAPM2.5_19$Date <- as.Date(EPAPM2.5_19$Date, format = "%m/%d/%Y")
 
 #4
+EPAO3_18_aq <- select(EPAO3_18, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+EPAO3_19_aq <- select(EPAO3_19, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+EPAPM2.5_18_aq <- select(EPAPM2.5_18, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
+EPAPM2.5_19_aq <- select(EPAPM2.5_19, Date, DAILY_AQI_VALUE, Site.Name, AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, SITE_LONGITUDE)
 
 #5
+EPAPM2.5_18_aq$AQS_PARAMETER_DESC <- str_replace(EPAPM2.5_18_aq$AQS_PARAMETER_DESC, "Acceptable PM2.5 AQI & Speciation Mass", "PM2.5")
+EPAPM2.5_19_aq$AQS_PARAMETER_DESC <- str_replace(EPAPM2.5_19_aq$AQS_PARAMETER_DESC, "Acceptable PM2.5 AQI & Speciation Mass", "PM2.5")
+
 
 #6
-
+write.csv(EPAO3_18_aq, row.names = FALSE, file = "../Data/Processed/EPAair_O3_NC2018_Processed.csv")
+write.csv(EPAO3_19_aq, row.names = FALSE, file = "../Data/Processed/EPAair_O3_NC2019_Processed.csv")
+write.csv(EPAPM2.5_18_aq, row.names = FALSE, file = "../Data/Processed/EPAair_PM25_NC2018_Processed.csv")
+write.csv(EPAPM2.5_19_aq, row.names = FALSE, file = "../Data/Processed/EPAair_PM25_NC2019_Processed.csv")
 ```
 
 
@@ -84,9 +100,33 @@ colnames(EPAPM2.5_19)
 
 ```{r}
 #7
+EPA_data <- rbind(EPAO3_18_aq, EPAO3_19_aq,EPAPM2.5_18_aq, EPAPM2.5_19_aq )
 
 #8
+EPA_data$DAILY_AQI_VALUE <- as.numeric(EPA_data$DAILY_AQI_VALUE)
+EPA_data$SITE_LATITUDE <- as.numeric(EPA_data$SITE_LATITUDE)
+EPA_data$SITE_LONGITUDE <- as.numeric(EPA_data$SITE_LONGITUDE)
+EPA_data_summary <- 
+  EPA_data %>% 
+  filter(Site.Name == "Linville Falls"| 
+           Site.Name == "Durham Armory"| 
+           Site.Name == "Leggett"| 
+           Site.Name == "Hattie Avenue"| 
+           Site.Name == "Clemmons Middle"| 
+           Site.Name == "Mendenhall School"| 
+           Site.Name == "Frying Pan Mountain"| 
+           Site.Name == "West Johnston Co."| 
+           Site.Name == "Garinger High School"| 
+           Site.Name == "Castle Hayne"| 
+           Site.Name == "Pitt Agri. Center"| 
+           Site.Name == "Bryson City"| 
+           Site.Name == "Millbrook School") %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
+  summarise(meanAQI = mean(DAILY_AQI_VALUE), 
+            meanLA = mean(SITE_LATITUDE), 
+            meanLG = mean(SITE_LONGITUDE))
 
+  
 #9
 
 #10

@@ -20,6 +20,14 @@ This exercise accompanies the lessons in Environmental Data Analytics on Data Ex
 
 The completed exercise is due on Sept 30th.
 
+```{r setup, include=FALSE}
+
+#install.packages('formatR')
+
+knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
+
+```
+
 ## Set up your R session
 
 1.  Check your working directory, load necessary packages (tidyverse), and upload two datasets: the ECOTOX neonicotinoid dataset (ECOTOX_Neonicotinoids_Insects_raw.csv) and the Niwot Ridge NEON dataset for litter and woody debris (NEON_NIWO_Litter_massdata_2018-08_raw.csv). Name these datasets "Neonics" and "Litter", respectively. Be sure to include the subcommand to read strings in as factors.
@@ -86,7 +94,7 @@ summary(Neonics$Species.Common.Name)
 class(Neonics$Conc.1..Author.)
 ```
 
-> Answer: The class of Conc.1..Author is character,  
+> Answer: The class of Conc.1..Author is character, and it maybe because this column is separate from the previous column, which contains the concentraion and unit. Or it might due to its original format before putting in R has not be changed to number.
 
 ## Explore your data graphically (Neonics)
 
@@ -100,13 +108,14 @@ ggplot(Neonics) +
 10. Reproduce the same graph but now add a color aesthetic so that different Test.Location are displayed as different colors.
 
 ```{r}
-ggplot(Neonics) +
-  geom_freqpoly(aes(x = Publication.Year, y = Test.Location), bins = 50, color = "pink")
+ggplot(Neonics, aes(x = Publication.Year, colour = Test.Location)) +
+  geom_freqpoly(bins = 50)
+  scale_x_continuous(limits = c(1980, 2020))
 ```
 
 Interpret this graph. What are the most common test locations, and do they differ over time?
 
-> Answer:
+> Answer: The most commom test varies over time. At the first dacade of collecting data, the main resource depdens on the lab. Then in the next 100-year period, the most comon test location becomes natral fields, which reached to a peak at around 2009. After that, conducting experiments from lab gradually dominated back as the most common  way to contain data until now.
 
 11. Create a bar graph of Endpoint counts. What are the two most common end points, and how are they defined? Consult the ECOTOX_CodeAppendix for more information.
 
@@ -139,7 +148,7 @@ unique(Litter$plotID)
 length(unique(Litter$plotID))
 ```
 
-> Answer: Data obtained from 'unique' could help to eliminate repeated values and help us understand the number of different character or value we have in this dataset. However, 'summary' function usually summarize the data to show its data distribution and characteristics by the class of the dataset. 
+> Answer: There are 12 plots sampled at NiwotRidge. Data obtained from 'unique' could help to eliminate repeated values and help us understand the number of different character or value we have in this dataset. However, 'summary' function usually summarize the data to show its data distribution and characteristics by the class of the dataset. 
 
 14. Create a bar graph of functionalGroup counts. This shows you what type of litter is collected at the Niwot Ridge sites. Notice that litter types are fairly equally distributed across the Niwot Ridge sites.
 
