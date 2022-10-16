@@ -47,22 +47,22 @@ print(O3plot)
 
 O3plot1 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
-  theme_gray()
+  theme_gray() #default ggplot theme so no difference with the previous one
 print(O3plot1)
 
 O3plot2 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
-  theme_bw()
+  theme_bw() #classic dark on light
 print(O3plot2)
 
 O3plot3 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
-  theme_light()
+  theme_light() #gray lines and axes on white backgrounds
 print(O3plot3)
 
 O3plot4 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone)) +
-  theme_classic()
+  theme_classic() #classic-looking theme, no gridlines background
 print(O3plot4)
 ```
 
@@ -78,6 +78,7 @@ If you would like to set a common theme across all plots in your analysis sessio
 mytheme <- theme_classic(base_size = 14) +
   theme(axis.text = element_text(color = "black"), 
         legend.position = "top") #alternative: legend.position + legend.justification
+#the labels font is 14, legend on top of graph
 
 # options: call the theme in each plot or set the theme at the start. 
 
@@ -86,7 +87,7 @@ O3plot5 <- ggplot(EPAair) +
   mytheme
 print(O3plot5)  
 
-theme_set(mytheme)
+theme_set(mytheme) #set theme for all subsequent plots
 
 O3plot6 <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone))
@@ -180,8 +181,8 @@ print(NvsP)
 NvsP2 <-
   ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = tn_ug, color = depth, shape = lakename)) +
   geom_point(alpha = 0.7, size = 2.5) +
-  #labs() + # change your legend labels here
-  scale_shape_manual(values = c(15, 17)) +
+  labs(color="Depth", shape="Lakename") + # change your legend labels here
+  scale_shape_manual(values = c(15, 17)) + #search fo the exact number
   #scale_color_distiller(palette = "Blues", direction = 1) + # use scale_color_brewer for discrete variables
   scale_color_viridis(option = "magma", direction = -1) +
   theme(legend.position = "right", 
@@ -197,9 +198,9 @@ Nutrientplot <-
   geom_boxplot() +
 # place your additional edits here
   scale_y_continuous(expand = c(0, 0)) +
-  #scale_color_brewer(palette = "YlGnBu") +
-  #scale_color_manual(values = c("#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84")) +
-  #scale_color_viridis(discrete = TRUE, end = 0.8) +
+  scale_color_brewer(palette = "YlGnBu") +
+  scale_color_manual(values = c("#7fcdbb", "#41b6c4", "#1d91c0", "#225ea8", "#0c2c84")) +
+  scale_color_viridis(discrete = TRUE, end = 0.8) +
   theme(legend.position = "right")
 print(Nutrientplot)
 ```
@@ -211,10 +212,10 @@ In situations where facets don't fill our needs to place multiple plots on a pag
 A useful guide for aligning plots by axis can be found here: https://wilkelab.org/cowplot/articles/aligning_plots.html
 
 ```{r, fig.height = 7, fig.width = 6}
-#install.packages("cowplot")
+install.packages("cowplot")
 library(cowplot)
 plot_grid(NvsP2, Nutrientplot, nrow = 2, align = 'h', rel_heights = c(1.25, 1))
-
+#adjust the area ont plot needs, like the upper size is 1.25
 ```
 
 ### Saving plots
@@ -239,9 +240,10 @@ The following graph displays the counts of specific endpoints measured in neonic
 ```{r}
 Neonics <- read.csv("./Data/Raw/ECOTOX_Neonicotinoids_Insects_raw.csv")
 ggplot(Neonics) +
-  geom_bar(aes(x = Endpoint))
-
-
-
+  geom_bar(aes(x = Endpoint))+
+ # reorder(x = Neonics$Endpoint,FUN = length)+
+  scale_x_discrete(limits = rev(levels(Neonics$Endpoint)))+
+  theme(axis.text.x = element_text(angle = 45,  hjust = 1))+
+  scale_color_viridis(discrete = TRUE, end = 0.8)
 
 ```

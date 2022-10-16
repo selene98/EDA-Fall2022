@@ -19,14 +19,14 @@ knitr::opts_chunk$set(tidy.opts=list(width.cutoff=80), tidy=TRUE)
 3. Apply a decision tree framework for appropriate graphing methods
 
 ## Opening discussion
-Effective data visualization depends on purposeful choices about graph types. The ideal graph type depends on the type of data and the message the visualizer desires to communicate. The best visualizations are clear and simple. A good resource for data visualization is [Data to Viz](https://www.data-to-viz.com/), which includes both a decision tree for visualization types and explanation pages for each type of data, including links to R resources to create them. Take a few minutes to explore this website.
+Effective data visualization depends on purposeful choices about graph types. The ideal graph type depends on the type of data and the message the visualizer desires to communicate. The best visualizations are clear and simple. A good resource for data visualization is [Data to Viz; ordered means the data is collected by time](https://www.data-to-viz.com/), which includes both a decision tree for visualization types and explanation pages for each type of data, including links to R resources to create them. Take a few minutes to explore this website.
 
 ## Set Up
 
 ```{r, message = FALSE, warning = FALSE}
 getwd()
 library(tidyverse)
-#install.packages("ggridges")
+#install.packages("ggridges"); #look at the distribution of variables
 library(ggridges)
 
 PeterPaul.chem.nutrients <- 
@@ -55,17 +55,17 @@ ggplot has only a few rules:
 
 Here are some commonly used layers for plotting in ggplot: 
 
-* geom_bar
+* geom_bar; bar plot
 * geom_histogram
-* geom_freqpoly
+* geom_freqpoly; frequence plot
 * geom_boxplot
 * geom_violin
 * geom_dotplot
 * geom_density_ridges
 * geom_point
-* geom_errorbar
+* geom_errorbar; trend line
 * geom_smooth
-* geom_line
+* geom_line; h-line & v-line
 * geom_area
 * geom_abline (plus geom_hline and geom_vline)
 * geom_text
@@ -73,18 +73,18 @@ Here are some commonly used layers for plotting in ggplot:
 ### Aesthetics
 Here are some commonly used aesthetic types that can be manipulated in ggplot: 
 
-* color
-* fill
-* shape
-* size
-* transparency
+* color; change the color
+* fill; change the bar or point color
+* shape; decide the shape of point
+* size; for point
+* transparency, for points and bars
 
 ### Plotting continuous variables over time: Scatterplot and Line Plot
 
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
 # Scatterplot
 ggplot(EPAair, aes(x = Date, y = Ozone)) + 
-  geom_point()
+  geom_point() #the point is not consistent because we chose the geom
 
 O3plot <- ggplot(EPAair) +
   geom_point(aes(x = Date, y = Ozone))
@@ -92,13 +92,13 @@ print(O3plot)
 
 # Fix this code
 O3plot2 <- ggplot(EPAair) +
-  geom_point(aes(x = Date, y = Ozone, color = "blue"))
+  geom_point(aes(x = Date, y = Ozone, color = "blue")) #adding another layer rather than just changing color.
 print(O3plot2)
 
 # Add additional variables
 # How could you automatically assign a marker color to a variable? 
 PMplot <- 
-  ggplot(EPAair, aes(x = Month, y = PM2.5, shape = as.factor(Year), color = Site.Name)) +
+  ggplot(EPAair, aes(x = Month, y = PM2.5, shape = as.factor(Year) , color = Site.Name)) + ##assign the different shape by year and different color by the site names
   geom_point()
 print(PMplot)
 
@@ -115,7 +115,7 @@ PMplot.faceted2 <-
                   Site.Name == "Bryson City"), 
          aes(x = Month, y = PM2.5)) + 
   geom_point() +
-  facet_grid(Site.Name ~ Year) 
+  facet_grid(Site.Name ~ Year) #adding columns for site names and year
 print(PMplot.faceted2)
 
 # Plot true time series with geom_line
@@ -142,7 +142,7 @@ print(lightvsDO)
 lightvsDOfixed <- 
   ggplot(PeterPaul.chem.nutrients, aes(x = irradianceWater, y = dissolvedOxygen)) +
   geom_point() +
-  xlim(0, 250) +
+  xlim(0, 250) + #the number of x axe is from 0 to 250
   ylim(0, 20)
 print(lightvsDOfixed)
 
@@ -151,14 +151,14 @@ tempvsdepth <-
   ggplot(PeterPaul.chem.nutrients, aes(x = temperature_C, y = depth)) +
   #ggplot(PeterPaul.chem.nutrients, aes(x = temperature_C, y = depth, color = daynum)) +
   geom_point() +
-  scale_y_reverse()
+  scale_y_reverse() #because the depth is getting bigger when going down, we want it go from large number to 0
 print(tempvsdepth)
 
 NvsP <-
   ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = tn_ug, color = depth)) +
   geom_point() +
   geom_smooth(method = lm) +
-  geom_abline(aes(slope = 16, intercept = 0))
+  geom_abline(aes(slope = 16, intercept = 0)) #already know the line
 print(NvsP)
 
 ```
@@ -172,21 +172,23 @@ What might be more effective ways to display the information? Navigate to the bo
 # Box and whiskers plot
 Nutrientplot3 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration)) +
-  geom_boxplot(aes(color = nutrient)) # Why didn't we use "fill"?
+  geom_boxplot(aes(color = nutrient)) # Why didn't we use "fill"? color changes the point color by group and fill only change the color of the box
 print(Nutrientplot3)
 
 # Dot plot
 Nutrientplot4 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration)) +
   geom_dotplot(aes(color = nutrient, fill = nutrient), binaxis = "y", binwidth = 1, 
-               stackdir = "center", position = "dodge", dotsize = 2) #
+               stackdir = "center", position = "dodge", dotsize = 2)+
+  ylim(0, 2500)#stack the observation over y-axe
 print(Nutrientplot4)
 
-# Violin plot
+# Violin plot-also discribe the density of data
 Nutrientplot5 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration)) +
   geom_violin(aes(color = nutrient)) #
 print(Nutrientplot5)
+
 
 # Frequency polygons
 # Using a tidy dataset
@@ -208,7 +210,7 @@ print(Nutrientplot7)
 # Frequency polygons have the risk of becoming spaghetti plots. 
 # See <https://www.data-to-viz.com/caveat/spaghetti.html> for more info.
 
-# Ridgeline plot
+# Ridgeline plot-change fill not color, alpha means the transparency
 Nutrientplot6 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(y = nutrient, x = concentration)) +
   geom_density_ridges(aes(fill = lakename), alpha = 0.5) #
