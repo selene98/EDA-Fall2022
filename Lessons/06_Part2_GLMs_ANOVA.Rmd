@@ -19,7 +19,7 @@ library(tidyverse)
 #install.packages("agricolae")
 library(agricolae)   #you may need to install/update package "htmltools" before installing and loading agricolae
 
-Litter <- read.csv("./Data_2022sp/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv", stringsAsFactors = TRUE)
+Litter <- read.csv("./Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv", stringsAsFactors = TRUE)
 
 # Set date to date format
 Litter$collectDate <- as.Date(Litter$collectDate , format = "%Y-%m-%d")
@@ -34,6 +34,8 @@ theme_set(mytheme)
 ### One-way ANOVA
 A one-way ANOVA is used when you have one categorical explanatory variable with more than two categories. In R, we can run the model with the function `lm` or `aov`, the latter of which will allow us to run post-hoc tests to determine pairwise differences.
 
+**if you reject the null hypothesis, it means at least one pair mean is not equal, but you do not know which two or more are not equal, at this time, the post-hoc test is applied to examine it.
+
 For example: Does total litter biomass differ among sites at the Niwot Ridge LTER?
 ```{r}
 # Wrangle the data
@@ -45,7 +47,7 @@ summary(Litter.Totals)
 #check all value of plotID
 summary(Litter.Totals$plotID)
 
-# Test for normality. 
+# Test for normality. the population is suited for normal distribution
 # Note: the important assumption for GLMs is normality of residuals, 
 # not necessarily normality of raw data. See below when we plot the model.
 # shapiro.test() performs the Shapiro-Wilk test of the null that data follows a normal distribution
@@ -63,8 +65,8 @@ shapiro.test(Litter.Totals$dryMass[Litter.Totals$plotID == "NIWO_063"])
 shapiro.test(Litter.Totals$dryMass[Litter.Totals$plotID == "NIWO_064"])
 shapiro.test(Litter.Totals$dryMass[Litter.Totals$plotID == "NIWO_067"])
 
-#results: reject null in all except two: NIWO_057 and NIWO_046
-#but method is robust from small deviations from normal distribution
+#results: reject null(follow the normal distribution) in all except two: NIWO_057 and NIWO_046
+#but method is robust from small deviations from normal distribution, we can see from the plot it does not follow the normal distribution.
 qqnorm(Litter.Totals$dryMass); qqline(Litter.Totals$dryMass)
 
 # Test for equal variance
@@ -75,7 +77,7 @@ bartlett.test(Litter.Totals$dryMass ~ Litter.Totals$plotID)
 #results: reject null i.e. variances are not equal
 
 # Format ANOVA as aov
-Litter.Totals.anova <- aov(data = Litter.Totals, dryMass ~ plotID)
+Litter.Totals.anova <- aov(data = Litter.Totals, dryMass ~ plotID) #continuour variable ~ categorial variable
 summary(Litter.Totals.anova)
 
 #results: reject null hypothesis i.e. difference between a pair of group means is statistically significant
@@ -155,12 +157,13 @@ If the interaction is significant, we interpret pairwise differences for the int
 # Run a post-hoc test for pairwise differences
 TukeyHSD(Litter.anova.2way3)
 
+# 
 Litter.interaction <- with(Litter, interaction(functionalGroup, nlcdClass))
 
 #Litter.test <- cbind(Litter,Litter.interaction)
 
 Litter.anova.2way5 <- aov(data = Litter, dryMass ~ Litter.interaction)
-
+#if the group could be compared, it means the difference between groups is not statistically significant
 Litter.groups <- HSD.test(Litter.anova.2way5, "Litter.interaction", group = TRUE)
 Litter.groups
 

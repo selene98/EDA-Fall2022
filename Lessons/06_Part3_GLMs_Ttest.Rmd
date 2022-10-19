@@ -61,7 +61,7 @@ EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
 > Exercise 1: State the hypotheses for testing mean of AQI index.
 
 > Answer: 
-H0: mu >= 50
+H0: mu >= 50  #which way to define is okay
 Ha: mu < 50
 
 ```{r}
@@ -70,6 +70,7 @@ length(EPAair$Ozone) #8976 observations
 
 O3.onesample <- t.test(EPAair$Ozone, mu = 50, alternative = "less")
 O3.onesample
+#"alternative is the Ha, reject the null Ho
 
 Ozone.plot <- ggplot(EPAair, aes(x = Ozone)) +
   geom_density(fill = "gray") +
@@ -79,7 +80,7 @@ Ozone.plot <- ggplot(EPAair, aes(x = Ozone)) +
 print(Ozone.plot)
 
 # Format as a GLM
-O3.onesample2 <- lm(Ozone ~ 1, EPAair)
+O3.onesample2 <- lm(Ozone ~ 1, EPAair) #1 means no interrelated variable; only one
 O3.onesample2
 ```
 
@@ -93,7 +94,8 @@ The two-sample *t* test is used to test the hypothesis that the mean of two samp
 
 For example, we might ask ourselves (from the EPA air quality processed dataset): 
 Are Ozone levels different between 2018 and 2019?
-
+Ho: mean 2018 = mean 2019
+Ha: mean 2018 != mean 2019
 ```{r}
 #First let's look at the data
 ggplot(EPAair, aes(x = Ozone, color = as.factor(Year))) +
@@ -104,10 +106,13 @@ ggplot(EPAair, aes(x = Ozone, color = as.factor(Year))) +
 #EPAair$Year will be our categorical variable with two levels (2018 and 2019)
 O3.twosample <- t.test(EPAair$Ozone ~ EPAair$Year)
 O3.twosample
+#P value is less than 0.05, we reject the null
 
 # Format as a GLM
 O3.twosample2 <- lm(EPAair$Ozone ~ EPAair$Year)
 summary(O3.twosample2)
+
+#"EPAair$Ozone ~ EPAair$Year" could be changed to "Ozone ~ Year, EPAair"
 
 ```
 
