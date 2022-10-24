@@ -18,6 +18,12 @@ editor_options:
 ```{r, message = FALSE}
 library(tidyverse)
 library(agricolae)   
+library(viridis)
+library(RColorBrewer)
+library(colormap)
+library(ggplot2)
+#install.packages("ggpmisc")
+library(ggpmisc)
 
 EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv", stringsAsFactors = TRUE)
 # Set date to date format
@@ -46,7 +52,27 @@ Create three plots, each with appropriately formatted axes and legends. Choose a
 
 ```{r}
 #Exercise 1:
+ex1 <- ggplot(EPAair, aes(x = Ozone, y =as.factor(Year))) +
+  geom_density(alpha = 0.5)+
+  scale_fill_manual(values = c("green", "blue"))+
+  labs(x= "Ozone AQI quality")
+print(ex1)
 
+ex2 <- ggplot(EPAair,aes(y=Ozone, x = as.factor(Year)))+
+  geom_boxplot()+
+  stat_summary(geom = "text", fun = max, vjust = -1, size = 4,
+               label=c("b", "a"))+
+  labs(x="",y="Ozone AQI quality")+
+  ylim(0,150)
+print(ex2)
+
+ex3 <- ggplot(EPAair,aes(y=Ozone, x = as.factor(Year)))+
+  geom_violin(draw_quantiles = 0.5)+
+  stat_summary(geom = "text", fun = max, vjust = -1, size = 4,
+               label=c("b", "a"))+
+  labs(x="",y="Ozone AQI quality")+
+  ylim(0,150)
+print(ex3)
 
 ```
 
@@ -59,11 +85,17 @@ For the NTL-LTER dataset, can we predict PM2.5 from Ozone?
 ```{r}
 
 #Exercise 2: Run a linear regression PM2.5 by Ozone. Find the p-value and R-squared value. 
-
-
+aq.regression <- lm(EPAair$PM2.5 ~ EPAair$Ozone)
+summary(aq.regression)
 
 #Exercise 3: Build a scatterplot. Add a line and standard error for the linear regression. Add the regression equation to the plot
-
+ex4 <-
+  ggplot(EPAair, aes(x = Ozone, y = PM2.5)) +
+  geom_point() +
+  stat_poly_line()+
+  stat_poly_eq(aes(label=paste(after_stat(eq.label),
+                               after_stat(rr.label),sep = "*\", \"*")))
+print(ex4)
 
 
 ```

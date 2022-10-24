@@ -125,14 +125,19 @@ Box3 <-
   xlab("Month")
 print(Box3)
 
-plot_grid(
-  Box1, Box2, Box3, nrow = 1, align = 'h', rel_heights = c(1.5, 1))
+Box1a <- Box1 + theme(legend.position='none')
+Box2b <- Box2 + theme(legend.position='none')
+Box3c <- Box3 + theme(legend.position='none')
+Gridplot <- plot_grid(Box1a, Box2b, Box3c, nrow = 1, align = 'h', rel_widths = c(1.2,1,1.1))
+legend <- get_legend(Box1)
+plot_grid(Gridplot, legend)
+
 ```
 
 Question: What do you observe about the variables of interest over seasons 
 and between lakes? 
 
-> Answer: In these three boxplots, we observed the seasonal change of temperature, phosphorus concentration and nitrate concentration, it is obvious to see the overall temperature in fall is much lower than that in summer as the the chemical levels going up. 
+> Answer: In these three boxplots, I observed the seasonal change of temperature, phosphorus concentration and nitrate concentration, it is obvious to see the overall temperature in fall is much lower than that in summer as the the chemical levels going up. The overall chemicals in Peter lake is higher than Paul lake according to the mean value and data range. The average temperature in Peter lake is lower than that in Paul lake.
 
 6. [Niwot Ridge] Plot a subset of the litter dataset by displaying only the 
 "Needles" functional group. Plot the dry mass of needle litter by date and 

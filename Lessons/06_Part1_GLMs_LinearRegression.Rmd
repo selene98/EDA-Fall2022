@@ -122,7 +122,7 @@ irradiancebydepth <-
   ggplot(PeterPaul.chem.nutrients, aes(x = depth, y = irradianceWater)) +
   ylim(0, 2000) +
   geom_point() 
-print(irradiancebydepth) 
+print(irradiancebydepth)
 ```
 
 Given the distribution of irradiance values, we don't have a linear relationship between x and y in this case. Let's try log-transforming the irradiance values. Note we also removing the observations that seems to ba an outlier.
