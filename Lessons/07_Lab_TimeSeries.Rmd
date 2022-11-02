@@ -81,15 +81,24 @@ BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 ```{r}
 
 #Exercise 5: Check if there is any missing data for both temperature and rainfall series.
-
-
-
+summary(BRA_complete$Rainfall)
+summary(BRA_complete$Temperature_C)
+###no missing data
 
 #Exercise 6: Plot both series over time on separate plots. Add a trend line using geom_smooth(). Can you say something about the trend just by visualizing the data?
 
-
-
-
+ex7.1<-
+  ggplot(BRA_complete, aes(x = Date, y = Rainfall)) +
+  geom_line() +
+  geom_smooth(method = lm, color="pink")
+print(ex7.1)
+#seasonal trend, overall stable
+ex7.2<-
+  ggplot(BRA_complete, aes(x = Date, y = Temperature_C)) +
+  geom_line() +
+  geom_smooth(method = lm, color="pink")
+print(ex7.2)
+#seasonal trend and going up overall
 
 
 ```
@@ -98,8 +107,7 @@ BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 
 ```{r}
 #Exercise 7: Create a time series objects for each series using ts(). Make sure you specify the starting point and frequency.
-
-
+BRA_complete.ts <- ts(BRA_complete$Date, start = c(1901,1), frequency = 12)
 
 ```
 
@@ -120,8 +128,8 @@ The `stl` function decomposes the time series object into its component parts. W
 
 # Exercise 8: Use the stl() function to decompose both series. 
 # Visualize the decomposed series using plot(). What components can you identify?
-
-
+BRA.decomposed <- stl( BRA_complete.ts, s.window = "periodic")
+plot(BRA.decomposed)
 
 
 
