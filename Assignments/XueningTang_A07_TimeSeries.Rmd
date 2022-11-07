@@ -37,6 +37,8 @@ library(lubridate)
 library(zoo)
 library(trend)
 library(dplyr)
+library(Kendall)
+library(tseries)
 
 my.theme <- theme_classic(base_size = 12) +
   theme(axis.text = element_text(color = "black"), 
@@ -44,27 +46,39 @@ my.theme <- theme_classic(base_size = 12) +
 theme_set(my.theme)
 
 #2
-air.2010 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2010_raw.csv",
+air.2010 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2010_raw.csv",
                          stringsAsFactors = TRUE)
-air.2011 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2011_raw.csv",
+air.2011 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2011_raw.csv",
                          stringsAsFactors = TRUE)
-air.2012 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2012_raw.csv",
+air.2012 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2012_raw.csv",
                          stringsAsFactors = TRUE)
-air.2013 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2013_raw.csv",
+air.2013 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2013_raw.csv",
                          stringsAsFactors = TRUE)
-air.2014 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2014_raw.csv",
+air.2014 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2014_raw.csv",
                          stringsAsFactors = TRUE)
-air.2015 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2015_raw.csv",
+air.2015 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2015_raw.csv",
                          stringsAsFactors = TRUE)
-air.2016 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2016_raw.csv",
+air.2016 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2016_raw.csv",
                          stringsAsFactors = TRUE)
-air.2017 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2017_raw.csv",
+air.2017 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2017_raw.csv",
                          stringsAsFactors = TRUE)
-air.2018 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2018_raw.csv",
+air.2018 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2018_raw.csv",
                          stringsAsFactors = TRUE)
-air.2019 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2019_raw.csv",
+air.2019 <- read.csv(
+  "../Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2019_raw.csv",
                          stringsAsFactors = TRUE)
-GaringerOzone <- rbind(air.2010, air.2011, air.2012, air.2013, air.2014, air.2015, air.2016, air.2017, air.2018, air.2019)
+GaringerOzone <- rbind(
+  air.2010, air.2011, air.2012, air.2013, air.2014, 
+  air.2015, air.2016, air.2017, air.2018, air.2019)
 ```
 
 ## Wrangle
@@ -79,12 +93,15 @@ GaringerOzone <- rbind(air.2010, air.2011, air.2012, air.2013, air.2014, air.201
 
 ```{r}
 # 3
-GaringerOzone$Date <- as.Date(GaringerOzone$Date, format = "%m/%d/%Y")
+GaringerOzone$Date <- 
+  as.Date(GaringerOzone$Date, format = "%m/%d/%Y")
 
 # 4
-GaringerOzone.short <- select(GaringerOzone, Date,
-                              Daily.Max.8.hour.Ozone.Concentration, 
-                              DAILY_AQI_VALUE)
+GaringerOzone.short <- 
+  select(GaringerOzone, 
+         Date,
+         Daily.Max.8.hour.Ozone.Concentration, 
+         DAILY_AQI_VALUE)
 
 # 5
 Date <- seq(as.Date("2010-01-01"),by="day",length.out=3652)
@@ -113,7 +130,7 @@ A7_PLOT1<-
 print(A7_PLOT1)
 ```
 
->Answer: The plot I printed shows a seasonal trend over time, the ozone concentration grows up when the weather becomes warmer in spring and summer and drops down as fall and winter coming.
+>Answer: The plot I printed shows a seasonal trend over time, the ozone concentration grows up when the weather becomes warmer in spring and summer and drops down as fall and winter coming. The avaerage trend based on years is not clearly going up or going down but quite stable.
 
 ## Time Series Analysis
 
@@ -129,7 +146,8 @@ GaringerOzone.clean <-
   mutate( Daily.Max.8.hour.Ozone.Concentration.clean =
             zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration) )
 
-summary(GaringerOzone.clean$Daily.Max.8.hour.Ozone.Concentration.clean)
+summary(
+  GaringerOzone.clean$Daily.Max.8.hour.Ozone.Concentration.clean)
 
 ggplot(GaringerOzone.clean) +
   geom_line(aes(x = Date, 
@@ -142,21 +160,24 @@ ggplot(GaringerOzone.clean) +
   ylab("Ozone Daily Concentration/ppm") 
 ```
 
-> Answer: 
-
+> Answer: Because using linear interpolation to fill in missing daily data for ozone concentration could assume the missing data to fall between the previous and next measurement, with a straight line drawn between the known points determining the values of the interpolated data on any given date. However, Piecewise constant assumes missing data to be equal to the measurement made nearest to that date (could be earlier or later), which is not suitable for our ideal model. Also, Spline is not a good one to make assumptions for missing data because it uses quadratic function to interpolate rather than drawing a straight line.
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
 
 ```{r}
 #9
 GaringerOzone.monthly <-
-  GaringerOzone %>%
+  GaringerOzone.clean %>%
   mutate(Month = month(Date))%>%
   mutate(Year = year(Date))%>%
   group_by(Year, Month)%>%
-  summarise(MeanOzone = mean(Daily.Max.8.hour.Ozone.Concentration))
-  
-GaringerOzone.monthly$DATE <- as.yearmon(paste(GaringerOzone.monthly$Year, GaringerOzone.monthly$Month), "%Y%m") 
+  summarise(MeanOzone = 
+              mean(Daily.Max.8.hour.Ozone.Concentration.clean))
+
+GaringerOzone.monthly$DATE <- 
+  as.yearmon(paste
+             (GaringerOzone.monthly$Year, 
+               GaringerOzone.monthly$Month), "%Y %m") 
 ```
 
 
@@ -164,8 +185,17 @@ GaringerOzone.monthly$DATE <- as.yearmon(paste(GaringerOzone.monthly$Year, Garin
 
 ```{r}
 #10
-GaringerOzone.daily.ts <- ts(GaringerOzone$Date, start = c(2010,1), frequency = 365)
-GaringerOzone.monthly.ts <- ts(GaringerOzone.monthly, start = c(2010,1), frequency = 12)
+f_month1 <- month(first(GaringerOzone.clean$Date))
+f_year1 <- year(first(GaringerOzone.clean$Date))
+GaringerOzone.daily.ts <-
+  ts(GaringerOzone.clean$Daily.Max.8.hour.Ozone.Concentration.clean,
+     start = c(f_year1,f_month1), frequency = 365)
+
+f_month2 <- first(GaringerOzone.monthly$Month)
+f_year2 <- first(GaringerOzone.clean$Year)
+GaringerOzone.monthly.ts <- 
+  ts(GaringerOzone.monthly$MeanOzone, 
+     start = c(f_year2,f_month2), frequency = 12)
 ```
 
 
@@ -173,10 +203,12 @@ GaringerOzone.monthly.ts <- ts(GaringerOzone.monthly, start = c(2010,1), frequen
 
 ```{r}
 #11
-GaringerOzone.daily.decomposed <- stl(GaringerOzone.daily.ts, s.window = "periodic")
+GaringerOzone.daily.decomposed <- 
+  stl(GaringerOzone.daily.ts, s.window = "periodic")
 plot(GaringerOzone.daily.decomposed)
 
-GaringerOzone.monthly.decomposed <- stl(GaringerOzone.monthly.ts, s.window = "periodic")
+GaringerOzone.monthly.decomposed <- 
+  stl(GaringerOzone.monthly.ts, s.window = "periodic")
 plot(GaringerOzone.monthly.decomposed)
 ```
 
@@ -185,11 +217,12 @@ plot(GaringerOzone.monthly.decomposed)
 
 ```{r}
 #12
-GaringerOzone.monthly.trend <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts)
+GaringerOzone.monthly.trend <- 
+  Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts)
 
 ```
 
-> Answer: Because there is always a clear going up or down trend showing in the monotonic trend and also the seasonal Mann-Kendall could help to dipict the trend in one specfic season or month. So in this case it is more appropriate.
+> Answer: Because the seasonal Mann-Kendall could help to dipict the trend in one specfic season or month, which could fit best for the seasonal data. So in this case it is more appropriate. For other monotonic trend analysis methods, linear regression, Mann-Kendall, Spearman Rho and Augmented Dickey Fuller all lack of the seasonality analysis ability.
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
@@ -209,7 +242,7 @@ print(A7_PLOT2)
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: 
+> Answer: Acoording to the 10-year Ozone concentration daily data we got, there is a clear seasonal trend and slightly going down overall trend observed from the linear plot. In order to reduce the noise of the data, we calculated the mean value of each month and the monthly data refelcts very perfect seasonal trend in the time series model components. The Seasonal MannKendall model also show the statitical significant to reject there isno seasonal trend in our data. So the ozone concentration fluctuates with the season, higher concentration in warm seasons and lower in cold seasons.
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -227,10 +260,9 @@ GaringerOzone.monthly.component <-
 
 
 #16
-
-
-
+GaringerOzone.monthly.trend2 <- 
+ MannKendall(GaringerOzone.monthly.ts)
 
 ```
 
-> Answer: 
+> Answer: From the model of MannKendall, the two-side p-value is large than the 0.1 so we can not reject the null hypothesis which means there is no trend in the data. However, the two side p-value from Seasonal MannKendall is samller then 0.05, it shows the statistic significance that there is seasonal trend in the data. Also, the Seasonal Kendall model has higher statitics and magnitude of Kendall score and lower denomination and variance of S, which show the more statistical significance of the data's seasonal trend.
