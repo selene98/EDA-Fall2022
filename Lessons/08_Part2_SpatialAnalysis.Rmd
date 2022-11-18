@@ -61,7 +61,7 @@ First, we'll read in our EPA air quality sites, as we did in the previous exerci
 
 ```{r convert.tabular.data.to.sf.object}
 #Read our EPA points into a spatial dataframe
-epa_pm25_sites_sf <- read_csv('./Data/Raw/EPAair_PM25_NC2018_raw.csv') %>% 
+epa_pm25_sites_sf <- read_csv('../Data/Raw/EPAair_PM25_NC2018_raw.csv') %>% 
   group_by(`Site Name`, COUNTY, SITE_LATITUDE, SITE_LONGITUDE) %>% 
   summarize(
     meanPM = mean(`Daily Mean PM2.5 Concentration`,na.rm=T),
@@ -90,7 +90,7 @@ Below we read in the USA counties shapefile, filtering for just the NC features 
 
 ```{r read.filtered.records.from.shapefile.to.sf.object}
 #
-counties_sf<- st_read('./Data/Spatial/cb_2018_us_county_20m.shp') %>% 
+counties_sf<- st_read('../Data/Spatial/cb_2018_us_county_20m.shp') %>% 
   filter(STATEFP == 37) #Filter for just NC Counties
 
 #
@@ -119,7 +119,7 @@ mapView(counties_sf, zcol = "AWATER")
 
 ```{r read HUCs shapefile}
 #Read the shapefile into an sf dataframe named "huc8_sf"
-huc8_sf<- st_read('./Data/Spatial/NCHUC8.shp')
+huc8_sf<- st_read('../Data/Spatial/NCHUC8.shp')
 
 #Reveal the columns
 colnames(huc8_sf)
@@ -144,7 +144,7 @@ mapView(huc8_sf, zcol = "ACRES")
 ```{r Select the Upper Neuse HUC 8}
 #Read the shapefile into an sf dataframe
 
-huc_sf<- st_read('./Data/Spatial/NCHUC8.shp') %>% 
+huc_sf<- st_read('../Data/Spatial/NCHUC8.shp') %>% 
   filter(SUBBASIN == "Upper Neuse") 
 
 #Create a map
