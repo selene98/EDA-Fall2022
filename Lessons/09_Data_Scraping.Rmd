@@ -254,7 +254,7 @@ scrape.it <- function(the_year, the_facility){
 
 ```{r test.the.function}
 #Run the function
-the_df <- scrape.it(2018,'0004-0001')
+the_df <- scrape.it(2017,'0004-0001')
 view(the_df)
 
 ```

@@ -1,9 +1,13 @@
 ---
-title: "Assignment 09: Data Scraping"
+title: 'Assignment 09: Data Scraping'
 author: "Xuening Tang"
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
+  word_document: default
 geometry: margin=2.54cm
-editor_options: 
+editor_options:
   chunk_output_type: console
 ---
 
@@ -26,11 +30,12 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 * Load the packages `tidyverse`, `rvest`, and any others you end up using.
 * Set your ggplot theme
 
-```{r, message = FALSE}
+```{r, message = FALSE, warning=FALSE}
 #1
 getwd()
 library(tidyverse)
 library(rvest)
+library(lubridate)
 
 my.theme <- theme_classic(base_size = 12) +
   theme(axis.text = element_text(color = "black"), 
@@ -46,9 +51,10 @@ theme_set(my.theme)
  
 Indicate this website as the as the URL to be scraped. (In other words, read the contents into an `rvest` webpage object.)
 
-```{r set.the.scraping.website}
+```{r set.the.scraping.website, message = FALSE}
 #2
-webpage.1 <- read_html('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2021')
+webpage.1 <- read_html(
+  'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2021')
 webpage.1
 
 ```
@@ -98,15 +104,25 @@ max.withdrawals.mgd <- webpage.1 %>%
 
 ```{r create.a.dataframe.from.scraped.data}
 #4
-df_water <- data.frame("Month" = rep(1:12),
-                       "Year" = rep(2021,12), 
-                       "Water_System_Name" = as.factor(water.system.name),
-                       "PSWID" = as.factor(pswid),
-                       "Ownership" = as.factor(ownership),)
+Max_withdraws_mgd <- data.frame(max.withdrawals.mgd)
+Max_final <- Max_withdraws_mgd[c(1,4,7,10,2,5,8,11,3,6,9,12),]
+
+df_water <- data.frame("max.withdrawals.mgd" = Max_final,
+                       "Month" = rep(1:12),
+                       "Year" = rep(2021,12))%>%
+  mutate(Water_System_Name = !!water.system.name,
+         PSWID = !!pswid,
+         Ownership = !!ownership,
+         Date = my(paste(Month,"-",Year)))
+
 
 
 #5
 
+plot(df_water$max.withdrawals.mgd,type = "o", 
+     col = "light blue", 
+     xlab = "Month", 
+     ylab = "Max_ withdraws of water/mgd")
 
 
 ```
@@ -115,8 +131,40 @@ df_water <- data.frame("Month" = rep(1:12),
 
 ```{r construct.a.scraping.function}
 #6.
+base_url <- 'https://www.ncwater.org/WUDC/app/LWSP/report.php'
+my_PWSID <- 'pwsid=03-43-015'
+my_Year <- 'year=2017'
+my_scrape_url <- paste0(base_url, '?', my_PWSID, '&', my_Year)
+print(my_scrape_url)
 
+my_scrape <- function(my_PWSID,my_Year){
+  my_website <- read_html(paste0(
+    'https://www.ncwater.org/WUDC/app/LWSP/report.php'
+                                , '?pwsid=', my_PWSID, '&year=', my_Year))
 
+  my_system_name_tag <- 'div+ table tr:nth-child(1) td:nth-child(2)'
+  my_pwsid_tag <- 'td tr:nth-child(1) td:nth-child(5)'
+  my_ownership_tag <- 'div+ table tr:nth-child(2) td:nth-child(4)'
+  my_max_withdraw_tag <- 'th~ td+ td'
+  
+  my_system_name <- my_website %>% 
+    html_nodes(my_system_name_tag) %>% html_text()
+  my_pwsid_name <- my_website %>% 
+    html_nodes(my_pwsid_tag) %>%html_text()
+  my_ownership <- my_website %>% 
+    html_nodes(my_ownership_tag) %>% html_text()
+  my_max_withdrawals <- my_website %>% 
+    html_nodes(my_max_withdraw_tag)%>%html_text()
+  
+  df_water <- data.frame(
+    "max.withdrawals.mgd" = as.numeric(my_max_withdrawals),
+    "Year" = rep(my_Year,12))%>%
+  mutate(Water_System_Name = !!my_system_name,
+         PWSID = !!my_pwsid_name,
+         Ownership = !!my_ownership)
+  
+return(df_water)
+}
 
 ```
 
@@ -124,7 +172,16 @@ df_water <- data.frame("Month" = rep(1:12),
 
 ```{r fetch.and.plot.Durham.2015.data}
 #7
+durh_df <- my_scrape('03-32-010','2015')
+view(durh_df)
 
+df_durh <- durh_df %>% 
+  mutate(Month = c(1,5,8,2,6,9,3,7,10,4,8,12),
+         Date = my(paste(Month,"-",Year)))
+durh_final <- df_durh[c(1,4,7,10,2,5,8,11,3,6,9,12),]
+
+ggplot(df_durh,aes(x=Date,y=max.withdrawals.mgd)) + 
+  geom_line(color="pink")
 
 ```
 
@@ -132,8 +189,22 @@ df_water <- data.frame("Month" = rep(1:12),
 
 ```{r fetch.and.plot.Asheville.2015.data}
 #8
+df_ashe <- my_scrape('01-11-010','2015')
+view(df_ashe)
+ashe_df <- df_ashe %>% 
+  mutate(Month = c(1,5,8,2,6,9,3,7,10,4,8,12),
+         Date = my(paste(Month,"-",Year)))
+ashe_final <- ashe_df[c(1,4,7,10,2,5,8,11,3,6,9,12),]
 
+df_combine <- full_join(ashe_final,durh_final)
 
+water.plot<-
+  ggplot(df_combine,aes(
+    x=Date,y=max.withdrawals.mgd, color=Water_System_Name)) + 
+  geom_line()+
+  ylab("Maximum daily withdraw of water/MGD")+
+  my.theme
+print(water.plot)
 ```
 
 
@@ -143,8 +214,26 @@ df_water <- data.frame("Month" = rep(1:12),
 
 ```{r fetch.and.plot.Asheville.multiyear.data}
 #9
+the_pwsid = '01-11-010'
+my_years = c(2010:2019) 
+
+ashe_dfs <- map(my_years,my_scrape,my_PWSID=the_pwsid)
+ashe_years <- bind_rows(ashe_dfs)
+ashe_years <- ashe_years %>% 
+  mutate(Month = rep(1:12,10),
+         Date = my(paste(Month,"-",Year)))
+
+
+ggplot(ashe_years,aes(x=Date,y=max.withdrawals.mgd)) + 
+  geom_line() + 
+  geom_smooth(method="loess",se=FALSE) +
+  labs(title = paste("Asheville daily withdraw change in 10 years"), 
+       subtitle = my_PWSID,
+       y="Daily Maximum Withdrawal/MGD", x="Date")+
+  my.theme
 
 
 ```
 
->Question: Just by looking at the plot (i.e. not running statistics), does Asheville have a trend in water usage over time?
+>Question: Just by looking at the plot (i.e. not running statistics), does Asheville have a trend in water usage over time?  
+#Based on the plot of water daily maximum withdraw change during 2010-2019, it is obvious to see the sharp increase from 2017, the recent years have clearly higher volume withdraws compared with the previous years. So there is an ovserved increasing trend water usage in Asheville over time.
